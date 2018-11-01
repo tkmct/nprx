@@ -1,7 +1,5 @@
-import hello from './hello'
-
 function main() {
-  return hello()
+  return 1
 }
 
 main()
