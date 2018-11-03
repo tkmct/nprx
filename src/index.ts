@@ -1,20 +1,24 @@
-import * as fs from 'fs'
-import * as net from 'net'
+import { ProxyWorker } from './proxyWorker'
+import { RawConfig } from './types'
 
-const DEFAULT_CONF_PATH = '/Users/uu107017/.ghq/github.com/tkmct/nprx'
-const CONF_PATH = process.env.NPRX_CONF_PATH || DEFAULT_CONF_PATH
+const workerQueue: ProxyWorker[] = []
 
-const confData = fs.readFileSync(CONF_PATH)
-console.info(confData.toString('utf-8', 0, confData.length))
+async function main() {
+  const DEFAULT_CONF_PATH = '../nprx.config.json'
+  const CONF_PATH = process.env.NPRX_CONF_PATH || DEFAULT_CONF_PATH
 
-const server = net.createServer(client => {
-  client.on('data', data => {
-    console.log('Server received data: ', data)
-  })
-})
+  // TODO: implement parsing function from raw json file
+  // using decoder library
+  const config: RawConfig = await import(CONF_PATH).then(data => data)
 
-server.listen(20000, () => {
-  server.on('close', () => {
-    console.log('TCP server socket is closed.')
-  })
-})
+  if (config.proxy) {
+    // TODO: check which is higher speed single thread or spawn new thread/process
+    config.proxy.forEach(p => {
+      const pw = new ProxyWorker(p)
+      pw.start()
+      workerQueue.push(pw)
+    })
+  }
+}
+
+main()
