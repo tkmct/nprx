@@ -2,6 +2,7 @@
   "proxy": [
     {
       "source": {
+        "host": "localhost",
         "port": 2233
       },
       "target": {
@@ -11,6 +12,7 @@
     },
     {
       "source": {
+        "host": "localhost",
         "port": 2222
       },
       "target": {
